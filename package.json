@@ -2,10 +2,10 @@
   "name": "social-media-backend",
   "version": "1.0.0",
   "description": "this is my second backend project",
-  "type":"module",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "start":"node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,8 +20,10 @@
   },
   "homepage": "https://github.com/Animeshkumar029/Social-Media-Backend#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1"
   }
 }

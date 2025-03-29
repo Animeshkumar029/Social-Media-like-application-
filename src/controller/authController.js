@@ -44,7 +44,7 @@ export const login=asyncHandler(async(req,res)=>{
 
     if(!user) throw new customError("Invalid credentials",400);
 
-    const iscorrect=await userSchema.comparePassword(password);
+    const iscorrect=await user.comparePassword(password);
     if(!iscorrect) throw new customError("Wrong Password",400);
 
     const token=user.getJWTtoken();
@@ -59,7 +59,7 @@ export const login=asyncHandler(async(req,res)=>{
 })
 
 export const logout=asyncHandler(async(req,res)=>{
-    req.cookie("token",null,{
+    res.cookie("token",null,{
         expires: new Date(Date.now()),
         httpOnly: true
     })

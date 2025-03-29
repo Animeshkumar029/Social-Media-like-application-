@@ -18,12 +18,12 @@ app.get("/",(_req,res)=>{
 })
 
 
-app.all("*",(_req,res)=>{
-    res.status(404).json({
-        success:false,
-        message:"Page not found"
-    })
-})
+// app.all("*",(_req,res)=>{
+//     res.status(404).json({
+//         success:false,
+//         message:"Error: Page not found"
+//     })
+// })
 
 
 export default app;

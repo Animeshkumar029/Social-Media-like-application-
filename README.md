@@ -1,6 +1,6 @@
 # Social-media-backend
 ## Introduction
-This is a social media-like application built using Node.js, Express.js, EJS for templating, and MongoDB as the database. The application allows users to connect, share posts, comment on posts, and like posts. Users can sign in with their username or email and interact with other users within the platform.
+This is a social media-like application built using Node.js, Express.js and MongoDB as the database. The application allows users to connect, share posts, comment on posts, and like posts. Users can sign in with their username or email and interact with other users within the platform.
 
 ## Features
 - Authentication:

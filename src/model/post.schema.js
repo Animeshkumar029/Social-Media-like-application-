@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 const postSchema=new mongoose.Schema({
     userid:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        ref:'User',
+        required:true
+    },
+    heading:{
+        type:String,
+        required:true
     },
     content:String,
     photos:[
@@ -16,7 +21,7 @@ const postSchema=new mongoose.Schema({
     ],
     postNumber: Number,
     createdAt:{
-        time: Date,
+        type: Date,
         default:Date.now
     }
 },{timestamps:true});

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const postSchema=new mongoose.Schema({
-    userid:{
+    userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
@@ -19,12 +19,8 @@ const postSchema=new mongoose.Schema({
             }
         }
     ],
-    postNumber: Number,
-    createdAt:{
-        type: Date,
-        default:Date.now
-    }
+    likeCount: Number
 },{timestamps:true});
 
 
-export default model.Schema("Post",postSchema);
+export default mongoose.model("Post",postSchema);

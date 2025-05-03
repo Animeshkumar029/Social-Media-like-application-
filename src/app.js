@@ -2,6 +2,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import router from "./routes/index.routes.js";
+import commentRouter from "./routes/comments.route.js";
+import likeRouter from "./routes/likes.routes.js";
 
 const app= express();
 
@@ -16,6 +18,9 @@ app.use("/api/v1",router);
 app.get("/",(_req,res)=>{
     res.send("this is the backend for my social media");
 })
+
+app.use("/api/v1",commentRouter);
+app.use("/api/v1",likeRouter);
 
 
 // app.all("*",(_req,res)=>{

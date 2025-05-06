@@ -19,7 +19,7 @@ const postSchema=new mongoose.Schema({
             }
         }
     ],
-    likeCount: Number
+    likeCount: Number,
 },{timestamps:true});
 
 

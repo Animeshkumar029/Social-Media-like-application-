@@ -4,7 +4,7 @@ import express from "express";
 import router from "./routes/index.routes.js";
 import commentRouter from "./routes/comments.route.js";
 import likeRouter from "./routes/likes.routes.js";
-
+import followRouter from "./routes/follow.routes.js";
 const app= express();
 
 app.use(express.json());
@@ -21,6 +21,8 @@ app.get("/",(_req,res)=>{
 
 app.use("/api/v1",commentRouter);
 app.use("/api/v1",likeRouter);
+app.use("/api/v1",followRouter);
+
 
 
 // app.all("*",(_req,res)=>{

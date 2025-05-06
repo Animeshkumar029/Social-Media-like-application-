@@ -33,6 +33,8 @@ const userSchema=new mongoose.Schema({
         enum:Object.values(AuthRoles),
         default:AuthRoles.USER
     },
+    followerCount: Number,
+    followingCount: Number,
     forgotPasswordToken:String,
     forgotPasswordExpiry:Date   
 },{timestamps:true});

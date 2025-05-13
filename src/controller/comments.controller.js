@@ -3,6 +3,9 @@ import postSchema from "../model/post.schema.js";
 import mongoose from "mongoose";
 import asyncHandler from "../services/asyncHandler.js";
 import customError from "../utils/customError.js";
+import User from "../model/user.schema.js";
+import { makeNotification } from "./notification.controller.js";
+import ntype from "../utils/notificationTypes.js";
 
 export const makeComment=asyncHandler(async(req,res)=>{
     const {postId}=req.params;
@@ -25,6 +28,17 @@ export const makeComment=asyncHandler(async(req,res)=>{
         userId,
         postId,
         content: commentContent.trim()
+    })
+
+    const senderUser=await User.findById(userId).select("name");
+    const senderName=senderUser.name;
+    
+    await makeNotification({
+        kind:ntype.COMMENT,
+        sender:userId,
+        receiver:post.author._id,
+        content:`${senderName} commented on ${post.heading}`,
+        post:postId
     })
 
     res.status(200).json({

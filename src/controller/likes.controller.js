@@ -3,6 +3,9 @@ import postSchema from "../model/post.schema.js";
 import asyncHandler from "../services/asyncHandler.js";
 import customError from "../utils/customError.js";
 import mongoose from "mongoose";
+import { makeNotification } from "./notification.controller.js";
+import User from "../model/user.schema.js";
+import ntype from "../utils/notificationTypes.js";
 
 export const likePost=asyncHandler(async(req,res)=>{
     const {postId}=req.params;
@@ -21,6 +24,17 @@ export const likePost=asyncHandler(async(req,res)=>{
     const like=await likesSchema.create({userId,postId});
 
     await postSchema.findByIdAndUpdate(postId,{$inc:{likeCount:1}});
+
+    const senderUser=await User.findById(userId).select("name");
+    const senderName=senderUser ? senderUser.name : "someone";
+
+    await makeNotification({
+        kind:"like",
+        receiver:post.author._id,
+        sender:userId,
+        content:`${senderName} liked your post ${post.heading}`,
+        post:postId
+    })
 
     res.status(200).json({
         success:true,
@@ -42,6 +56,17 @@ export const unlikePost=asyncHandler(async(req,res)=>{
     const post=await postSchema.findById(postId);
 
     if(post.likeCount>0) await postSchema.findByIdAndUpdate(postId,{$inc:{likeCount: -1}});
+
+    const senderUser=await User.findById(userId).select("name");
+    const senderName=senderUser?senderUser.name:"someone";
+
+    await Notification.create({
+        kind:ntype.LIKE,
+        sender:userId,
+        receiver:post.author._id,
+        content:`${senderName} unliked your post with heading ${post.heading}`,
+        post:postId
+    })
 
 
     res.status(200).json({

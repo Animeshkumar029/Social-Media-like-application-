@@ -2,6 +2,7 @@ import userSchema from "../model/user.schema.js";
 import customError from "../utils/customError.js";
 import asyncHandler from "../services/asyncHandler.js";
 import cookieOptions from "../utils/cookieOptions.js";
+import { mailFunction } from "../services/mailer.js";
 
 
 
@@ -20,6 +21,11 @@ export const signup=asyncHandler(async (req,res)=>{
     const token=user.getJWTtoken();
 
     user.password=undefined;
+
+    await mailFunction(email,
+        "Signup Successful",
+        "Welcome to Our website, thankyou for signing-up here"
+    )
 
     res.cookie("token",token,cookieOptions);
 
@@ -50,6 +56,11 @@ export const login=asyncHandler(async(req,res)=>{
     const token=user.getJWTtoken();
     res.cookie("token",token,cookieOptions);
 
+    await mailFunction(email,
+        "Login confirmation mail",
+        "You have logged-in to our website with this email, welcome back"
+    )
+
     return res.status(200).json({
         success:true,
         message:"user logged in sucessfully",
@@ -63,6 +74,11 @@ export const logout=asyncHandler(async(req,res)=>{
         expires: new Date(Date.now()),
         httpOnly: true
     })
+
+    await mailFunction(req.user.email,
+        "Log-out confirmation",
+        "User logged-out successfully, hope to see to you soon"
+    )
 
     res.status(200).json({
         success:true,

@@ -85,3 +85,67 @@ export const logout=asyncHandler(async(req,res)=>{
         message:"User logged out"
     })
 })
+
+
+export const forgotPassword=asyncHandler(async(req,res)=>{
+    const email=req.body.email;
+
+    if(!email) throw new customError("Invalid email id provided",422);
+
+    const user=await userSchema.findOne({email});
+
+    if(!user) throw new customError("User not found",422);
+
+    const forgotToken=user.generateForgotPasswordToken();
+
+    await user.save({validateBeforeSave:false});
+
+    const reseturl=`${req.protocol}://${req.get('host')}/api/v1/auth/password/reset/${forgotToken}`;
+
+    const message=`You have requested to reset your password, here is the link for that \n\n ${reseturl} \n\n IGNORE IF YOU DID NOT REQUESTED THIS`;
+
+    try{
+        await mailFunction(email,
+        "Forgot password and reset request",
+        message
+    )
+    }catch(error){
+        user.forgotPasswordToken=undefined;
+        user.forgotPasswordExpiry=undefined;
+        await user.save({validateBeforeSave:false})
+
+        throw new customError("Mail sending failed", 500);
+    }
+})
+
+
+export const resetpassword=asyncHandler(async(req,res)=>{
+
+    const checkToken=crypto
+                     .createHash("sha256")
+                     .update(req.params.forgotToken)
+                     .digest("hex")
+
+    const user=await userSchema.findOne({
+        forgotPasswordToken: checkToken,
+        forgotPasswordExpiry: {$gt: Date.now()}
+    })                
+
+    if(!user) throw new customError("Invalid request",404);
+
+    const password=req.body.password;
+    const confirmPassword=req.body.confirmPassword;
+
+    if(!password || !confirmPassword || password!==confirmPassword) throw new customError("Either password or confirm password is missing or they do not match",422);
+
+    user.password=password;
+    user.forgotPasswordExpiry=undefined;
+    user.forgotPasswordToken=undefined;
+    
+    await user.save({validateBeforeSave:true});
+
+    res.status(200).json({
+        success:true,
+        message:"Password reset successfully"
+    })
+})

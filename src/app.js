@@ -6,20 +6,22 @@ import commentRouter from "./routes/comments.route.js";
 import likeRouter from "./routes/likes.routes.js";
 import followRouter from "./routes/follow.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
+import { limiterFunction } from "./middlewares/rateLimiter.middleware.js";
 
 const app= express();
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cors());
 app.use(cookieParser());
-
-
-app.use("/api/v1",router);
+app.use(limiterFunction);
 
 app.get("/",(_req,res)=>{
     res.send("this is the backend for my social media");
 })
+
+app.use("/api/v1",router);    // auth or user router
 
 app.use("/api/v1",commentRouter);
 app.use("/api/v1",likeRouter);

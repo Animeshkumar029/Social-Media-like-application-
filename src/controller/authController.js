@@ -3,6 +3,8 @@ import customError from "../utils/customError.js";
 import asyncHandler from "../services/asyncHandler.js";
 import cookieOptions from "../utils/cookieOptions.js";
 import { mailFunction } from "../services/mailer.js";
+import crypto from "crypto";
+import { mailFunction } from "../services/mailer.js";
 
 
 
@@ -16,25 +18,51 @@ export const signup=asyncHandler(async (req,res)=>{
     const isExisting=await userSchema.findOne({email});
     if(isExisting) throw new customError("User already exists",400);
 
-    const user=await userSchema.create({name,password,email});
+    const verToken=crypto.randomBytes(12).toString('hex');
+    const verTokenExpiry= Date.now()+15*60*1000;
 
-    const token=user.getJWTtoken();
+    const user=await userSchema.create({name,password,email,
+        verificationToken:verToken,
+        verificationExpiry:verTokenExpiry
+    });
 
-    user.password=undefined;
+    const verURL=`${req.protocol}://${req.get('host')}/api/v1/auth/verifyEmail/${verToken}?email=${email}`;
+    const message=`You have been registered on our site and now verification must be done to proceed further, click on this ${verURL}  url to verify your email`;
 
-    await mailFunction(email,
-        "Signup Successful",
-        "Welcome to Our website, thankyou for signing-up here"
-    )
-
-    res.cookie("token",token,cookieOptions);
+    await mailFunction(email,"Verify email",message);
 
     res.status(200).json({
         success:true,
-        message: "user created successfully",
-        user,
-        token
+        message: "User registerd successfully and verification mail sent, login again after verification to enter our site"
     })
+})
+
+export const verifyEmail=asyncHandler(async(req,res)=>{
+    const email=req.query.email;
+    const token=req.params.verToken;
+
+    if(!email || !token) throw new customError("Either email or token is missing",400);
+
+    const user=await userSchema.findOne({email:email,verificationToken:token,verificationExpiry:{$gt: Date.now()}});
+
+    if(!user) throw new customError("No such user",422);
+
+    user.isVerified=true;
+    user.verificationExpiry=undefined;
+    user.verificationToken=undefined;
+
+    await user.save({validateBeforeSave:true});
+
+    await mailFunction(email,
+        "Verifiaction Done",
+        "Your verification is completed now, login to enter our site"
+    )
+
+    res.status(200).json({
+        success:true,
+        message:"Email Verification completed"
+    })
+
 })
 
 export const login=asyncHandler(async(req,res)=>{

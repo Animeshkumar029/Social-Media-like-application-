@@ -36,7 +36,14 @@ const userSchema=new mongoose.Schema({
     followerCount: Number,
     followingCount: Number,
     forgotPasswordToken:String,
-    forgotPasswordExpiry:Date   
+    forgotPasswordExpiry:Date,
+    
+    isVerified:{
+        type:Boolean,
+        default: false
+    },
+    verificationToken :String,
+    verificationExpiry: Date
 },{timestamps:true});
 
 userSchema.pre('save',async function(next){
@@ -50,7 +57,7 @@ userSchema.methods.comparePassword=async function (enteredPassword){
 };
 
 userSchema.methods.getJWTtoken=function(){
-    return JWT.sign({_id:this._id,role:this.role},config.JWT_SECRET_KEY,{expiresIn: config.JWT_EXPIRY});
+    return JWT.sign({_id:this._id,role:this.roles},config.JWT_SECRET_KEY,{expiresIn: config.JWT_EXPIRY});
 };
 
 userSchema.methods.generateForgotPasswordToken=function(){

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login,logout,signup,forgotPassword,resetpassword } from "../controller/authController.js";
+import { login,logout,signup,forgotPassword,resetpassword,verifyEmail } from "../controller/authController.js";
 import { isLoggedin } from "../middlewares/authMiddleware.js";
 
 const router=Router();
@@ -12,6 +12,7 @@ router.get("/profile",isLoggedin);
 
 router.patch("/password/forgotPassword",forgotPassword);
 router.patch("/password/reset/:token",resetpassword);
+router.get("/verifyEmail/:verToken",verifyEmail)
 
 
 export default router;

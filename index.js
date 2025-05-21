@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import app from "./src/app.js";
 import config from "./src/config/index.config.js";
+import './src/schedulers/localUploads.scheduler.js'
 
 (
     async()=>{

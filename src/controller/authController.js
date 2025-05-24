@@ -4,9 +4,7 @@ import asyncHandler from "../services/asyncHandler.js";
 import cookieOptions from "../utils/cookieOptions.js";
 import { mailFunction } from "../services/mailer.js";
 import crypto from "crypto";
-
-
-
+import { generateUsername } from "../services/username.service.js";
 
 export const signup=asyncHandler(async (req,res)=>{
     let name=req.body.name;
@@ -18,22 +16,26 @@ export const signup=asyncHandler(async (req,res)=>{
     const isExisting=await userSchema.findOne({email});
     if(isExisting) throw new customError("User already exists",400);
 
+    const username=await generateUsername(name);
+
     const verToken=crypto.randomBytes(12).toString('hex');
     const verTokenExpiry= Date.now()+15*60*1000;
 
-    const user=await userSchema.create({name,password,email,
+    const user=await userSchema.create({name,username,password,email,
         verificationToken:verToken,
         verificationExpiry:verTokenExpiry
     });
 
     const verURL=`${req.protocol}://${req.get('host')}/api/v1/auth/verifyEmail/${verToken}?email=${email}`;
-    const message=`You have been registered on our site and now verification must be done to proceed further, click on this ${verURL}  url to verify your email`;
+    const message=`You have been registered on our site and now verification must be done to proceed further, 
+                click on this ${verURL}  url to verify your email.
+                Also your unique username is "${username}"  you can also user it to login`;
 
     await mailFunction(email,"Verify email",message);
 
     res.status(200).json({
         success:true,
-        message: "User registerd successfully and verification mail sent, login again after verification to enter our site"
+        message: "User registerd successfully and verification mail sent, login either using email or username(provided) again after verification to enter our site"
     })
 })
 
@@ -66,20 +68,40 @@ export const verifyEmail=asyncHandler(async(req,res)=>{
 })
 
 export const login=asyncHandler(async(req,res)=>{
+    let username=req.body.username;
     let email=req.body.email;
     let password=req.body.password;
 
-    if(!email||!password) throw  new customError("FillUp all credentials",400);
+    if(!username && !email) throw new customError("Either email or username must be provide for login",400);
 
-    const isuser=await userSchema.findOne({email});
-    if(!isuser) throw new customError("No User found",400);
+    if(!password) throw  new customError("Password credential must be provided",400);
 
-    const user=await userSchema.findOne({email}).select("+password");
+    let user;
+    if(username) user=await userSchema.findOne({username}).select('+password');
+    else user=await userSchema.findOne({email}).select("+password");
 
     if(!user) throw new customError("Invalid credentials",400);
 
     const iscorrect=await user.comparePassword(password);
     if(!iscorrect) throw new customError("Wrong Password",400);
+
+    if(!user.isVerified){
+        const verToken=crypto.randomBytes(12).toString('hex');
+        const verTokenExpiry= Date.now()+15*60*1000;
+
+        if(!email) throw new customError("Unverified user must login with email",400);
+
+        user.verificationExpiry=verTokenExpiry;
+        user.verificationToken=verToken;
+        await user.save();
+        
+        const verURL=`${req.protocol}://${req.get('host')}/api/v1/auth/verifyEmail/${verToken}?email=${email}`;
+        const message=`Click on this ${verURL}  url to verify your email`
+
+        await mailFunction(email,"Verify email",message);
+
+        throw new customError("Go to the mail box for verification url",400);
+    }
 
     const token=user.getJWTtoken();
     res.cookie("token",token,cookieOptions);

@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "multer": "^2.0.0",
+    "nanoid": "^5.1.5",
     "node-cron": "^4.0.5",
     "nodemailer": "^7.0.3"
   }

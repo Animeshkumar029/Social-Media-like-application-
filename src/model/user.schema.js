@@ -14,6 +14,9 @@ const userSchema=new mongoose.Schema({
         trim:true,
         maxLength:[30,"Username can't be more than of 30 characeters"]
     },
+    username:{
+        type:String
+    },
     postcount:{
         type:Number,
         default:0

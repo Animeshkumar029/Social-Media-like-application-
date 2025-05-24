@@ -1,6 +1,6 @@
-import mongoose, { model } from "mongoose"; 
+import mongoose from "mongoose"; 
 import ntype from "../utils/notificationTypes.js";
-import userSchema from "./user.schema.js";
+
 
 
 const notificationSchema=new mongoose.Schema({

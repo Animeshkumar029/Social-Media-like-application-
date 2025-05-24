@@ -1,6 +1,4 @@
 import Notification from "../model/notifications.schema.js";
-import User from "../model/user.schema.js";
-import Post from "../model/post.schema.js";
 import asyncHandler from "../services/asyncHandler.js";
 import customError from "../utils/customError.js";
 import ntype from "../utils/notificationTypes.js";
@@ -24,6 +22,22 @@ export const makeNotification=async ({kind,sender,receiver,content,post}) =>{
     return notice;
 };
 
+export const postNotifications=async({kind,sender,receiver,content,post})=>{
+    if(!sender || !kind || !receiver || !content || !post) throw new customError("Required feilds are absent",422);
+
+    if(!Object.values(ntype).includes(kind)) throw new customError("Invalid notification type",422);
+
+    const notice=await Notification.create({
+        kind,
+        content,
+        sender,
+        receiver,
+        post
+    })
+
+    return notice;
+}
+
 export const getAllNotications=asyncHandler(async(req,res)=>{
     const userId=req.user._id;
     
@@ -42,7 +56,9 @@ export const getAllNotications=asyncHandler(async(req,res)=>{
 })
 
 export const getAllNotificationsFromParticularSender=asyncHandler(async(req,res)=>{
-    const {sender,receiver}=req.query;
+    //const {sender,receiver}=req.query;
+    const receiver=req.user._id;
+    const sender=req.params.senderId
 
     if(!sender || !receiver) throw new customError("Either sender or receiver is not mentioned",422);
 

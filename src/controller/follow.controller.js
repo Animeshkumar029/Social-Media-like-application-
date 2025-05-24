@@ -1,24 +1,23 @@
-import mongoose from "mongoose";
 import followSchema from "../model/follow.Schema.js";
 import userSchema from "../model/user.schema.js";
 import asyncHandler from "../services/asyncHandler.js";
 import customError from "../utils/customError.js";
 
 export const startFollowing=asyncHandler(async(req,res)=>{
-    const userId=req.user._id;
+    const followerId=req.user._id;
     const {toFollowId}=req.params;
 
     if(!toFollowId) throw new customError("Invalid id is provided",422);
 
-    if(userId.toString()==toFollowId.toString()) throw new customError("You can't follow yourself",403);
+    if(followerId.toString()==toFollowId.toString()) throw new customError("You can't follow yourself",403);
 
-    const alreadyFollowing=await followSchema.findOne({userId,toFollowId});
+    const alreadyFollowing=await followSchema.findOne({followerId,toFollowId});
 
     if(alreadyFollowing) throw new customError("You already follow this account",422);
 
-    const started=await followSchema.create({userId,toFollowId});
+    const started=await followSchema.create({followerId,toFollowId});
 
-    await userSchema.findByIdAndUpdate(userId,{$inc: {followingCount: 1}});
+    await userSchema.findByIdAndUpdate(followerId,{$inc: {followingCount: 1}});
 
     await userSchema.findByIdAndUpdate(toFollowId,{$inc:{followerCount:1}});
 
@@ -30,21 +29,21 @@ export const startFollowing=asyncHandler(async(req,res)=>{
 })
 
 export const unfollow=asyncHandler(async(req,res)=>{
-    const userId=req.user._id;
-    const {toUnfollowId}=req.params;
+    const followerId=req.user._id;
+    const {toFollowId}=req.params;
 
-    if(!toUnfollowId) throw new customError("You have given an invalid id",422);
+    if(!toFollowId) throw new customError("You have given an invalid id",422);
 
-    if(userId.toString()==toUnfollowId.toString()) throw new customError("You cannot unfollow yourself idiot", 422);
+    if(followerId.toString()==toFollowId.toString()) throw new customError("You cannot unfollow yourself idiot", 422);
 
-    const alreadyFollowing=await followSchema.findOne({userId,toUnfollowId});
+    const alreadyFollowing=await followSchema.findOne({followerId,toFollowId});
 
     if(!alreadyFollowing) throw new customError("You can not unfollow an account which you are not following",422);
 
-    const unfollowed=await followSchema.findOneAndDelete({userId,toUnfollowId});
+    const unfollowed=await followSchema.findOneAndDelete({followerId,toFollowId});
 
-    await userSchema.findByIdAndUpdate(userId,{$inc:{followingCount: -1}});
-    await userSchema.findByIdAndUpdate(toUnfollowId,{$inc:{followerCount:-1}});
+    await userSchema.findByIdAndUpdate(followerId,{$inc:{followingCount: -1}});
+    await userSchema.findByIdAndUpdate(toFollowId,{$inc:{followerCount:-1}});
 
     res.status(200).json({
         success:true,

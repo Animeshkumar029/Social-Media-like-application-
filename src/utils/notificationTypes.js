@@ -5,7 +5,8 @@ const ntype={
     LOGOUT:"logOut",
     LIKE:"like",
     COMMENT:"comment",
-    FOLLOW:"follow"
+    FOLLOW:"follow",
+    POST:"post"
 }
 
 export default ntype;

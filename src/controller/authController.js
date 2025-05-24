@@ -4,7 +4,7 @@ import asyncHandler from "../services/asyncHandler.js";
 import cookieOptions from "../utils/cookieOptions.js";
 import { mailFunction } from "../services/mailer.js";
 import crypto from "crypto";
-import { mailFunction } from "../services/mailer.js";
+
 
 
 
@@ -135,8 +135,12 @@ export const forgotPassword=asyncHandler(async(req,res)=>{
     try{
         await mailFunction(email,
         "Forgot password and reset request",
-        message
-    )
+        message);
+
+        res.status(200).json({
+            success:true,
+            message:"Reset mail sent successfully"
+        })
     }catch(error){
         user.forgotPasswordToken=undefined;
         user.forgotPasswordExpiry=undefined;
@@ -148,6 +152,11 @@ export const forgotPassword=asyncHandler(async(req,res)=>{
 
 
 export const resetpassword=asyncHandler(async(req,res)=>{
+
+    console.log(req.params);
+
+    if(req.params.forgotToken==undefined) throw new customError("Forgot token is undefined",400);
+    
 
     const checkToken=crypto
                      .createHash("sha256")

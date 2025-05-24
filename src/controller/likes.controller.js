@@ -30,7 +30,7 @@ export const likePost=asyncHandler(async(req,res)=>{
 
     await makeNotification({
         kind:"like",
-        receiver:post.author._id,
+        receiver:post.userId,
         sender:userId,
         content:`${senderName} liked your post ${post.heading}`,
         post:postId
@@ -60,10 +60,10 @@ export const unlikePost=asyncHandler(async(req,res)=>{
     const senderUser=await User.findById(userId).select("name");
     const senderName=senderUser?senderUser.name:"someone";
 
-    await Notification.create({
+    await makeNotification({
         kind:ntype.LIKE,
         sender:userId,
-        receiver:post.author._id,
+        receiver:post.userId,
         content:`${senderName} unliked your post with heading ${post.heading}`,
         post:postId
     })

@@ -36,7 +36,7 @@ export const makeComment=asyncHandler(async(req,res)=>{
     await makeNotification({
         kind:ntype.COMMENT,
         sender:userId,
-        receiver:post.author._id,
+        receiver:post.userId,
         content:`${senderName} commented on ${post.heading}`,
         post:postId
     })
@@ -53,7 +53,7 @@ export const getCommentOnParticularPost=asyncHandler(async(req,res)=>{
     const {postId}=req.params;
     const userId=req.user._id;
 
-    if(!mongoose.Schema.Types.ObjectId.isValid(postId)) throw new customError("given postId is not valid",422);
+    if(!mongoose.Types.ObjectId.isValid(postId)) throw new customError("given postId is not valid",422);
 
     const post=await postSchema.findById(postId);
 

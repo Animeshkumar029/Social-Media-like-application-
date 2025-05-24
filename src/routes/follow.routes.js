@@ -5,8 +5,8 @@ import { isLoggedin } from "../middlewares/authMiddleware.js";
 const router=Router();
 
 
-router.post('/follow/:toFollowId',isLoggedin,startFollowing);
-router.delete('/follow/:toFollowId',isLoggedin,unfollow);
+router.get('/follow/:toFollowId',isLoggedin,startFollowing);
+router.get('/unfollow/:toFollowId',isLoggedin,unfollow);
 router.get('/followers/count',isLoggedin,totalFollowers);
 router.get('/following/count',isLoggedin,totalFollowing);
 router.get('/followersList',isLoggedin,followersList);

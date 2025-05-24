@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 
-const localUploadCron=nodeCron.schedule("0 12 * * *",()=>{                      // will execute the job everyday at 12 pm
+const localUploadCron=nodeCron.schedule("0 0 * * *",()=>{                      // will execute the job everyday at 12 am
 
     const folder="./localUploads";
     if(!fs.existsSync(folder)){
@@ -15,7 +15,7 @@ const localUploadCron=nodeCron.schedule("0 12 * * *",()=>{                      
         if(err){
             console.log(new Error(err.message));
             return;
-        } 
+        }
 
         for(const file of files){
             try{

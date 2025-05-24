@@ -21,6 +21,7 @@ export const mailFunction=async(to,subject,text)=>{
     })
 
     console.log("Mail sent",send.messageId);
+    console.log("Preview URL:", nodemailer.getTestMessageUrl(send)); 
     }catch(error){
         console.log("Error occured :",error.message)
         throw error;

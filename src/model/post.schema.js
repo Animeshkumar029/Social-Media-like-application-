@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import fileTypes from "../utils/postFileTypes.js";
 
 const postSchema=new mongoose.Schema({
     userId:{
@@ -11,15 +12,23 @@ const postSchema=new mongoose.Schema({
         required:true
     },
     content:String,
-    photos:[
-        {
+    file:[
+        {   type:{
+            type:String,
+            enum:Object.values(fileTypes),
+            required:true
+        },
             secure_url:{
                 type:String,
                 required:true
-            }
+            },
+            public_id: String
         }
     ],
-    likeCount: Number,
+    likeCount:{
+        type:Number,
+        default: 0
+    }
 },{timestamps:true});
 
 

@@ -6,6 +6,7 @@ import commentRouter from "./routes/comments.route.js";
 import likeRouter from "./routes/likes.routes.js";
 import followRouter from "./routes/follow.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
+import postRouter from "./routes/posts.routes.js";
 import { limiterFunction } from "./middlewares/rateLimiter.middleware.js";
 
 const app= express();
@@ -27,6 +28,7 @@ app.use("/api/v1",commentRouter);
 app.use("/api/v1",likeRouter);
 app.use("/api/v1",followRouter);
 app.use("/api/v1",notificationRouter);
+app.use('/api/v1/posts',postRouter)
 
 
 
